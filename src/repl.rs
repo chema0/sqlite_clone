@@ -3,6 +3,8 @@ use std::{
     process::exit,
 };
 
+use crate::compiler::parse;
+
 const SUCCESS_EXIT: i32 = 1;
 
 pub fn start_repl() {
@@ -69,9 +71,14 @@ enum Statement {
 }
 
 fn prepare_statement(input: &String) -> Option<&Statement> {
-    match input.as_str() {
-        "insert" => Some(&Statement::Insert),
-        "select" => Some(&Statement::Select),
+    let values: Vec<&str> = input.split(' ').take(1).collect();
+    match values.first() {
+        Some(&"insert") => {
+            // TODO: parse 'insert; statement
+            parse(input);
+            Some(&Statement::Insert)
+        }
+        Some(&"select") => Some(&Statement::Select),
         _ => None,
     }
 }
