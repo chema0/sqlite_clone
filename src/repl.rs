@@ -3,7 +3,7 @@ use std::{
     process::exit,
 };
 
-use crate::compiler::parse;
+use crate::compiler::{parse, Statement};
 
 const SUCCESS_EXIT: i32 = 1;
 
@@ -24,10 +24,7 @@ pub fn start_repl() {
 
         let statement = match prepare_statement(&input) {
             Some(x) => x,
-            None => {
-                println!("Unrecognized keyword at start of '{input}'");
-                continue;
-            }
+            None => continue,
         };
 
         execute_statement(&statement);
@@ -65,21 +62,13 @@ fn do_meta_command(input: &String) -> MetaCommandResult {
     MetaCommandResult::UnrecognizedCommand
 }
 
-enum Statement {
-    Insert,
-    Select,
-}
-
 fn prepare_statement(input: &String) -> Option<&Statement> {
-    let values: Vec<&str> = input.split(' ').take(1).collect();
-    match values.first() {
-        Some(&"insert") => {
-            // TODO: parse 'insert; statement
-            parse(input);
-            Some(&Statement::Insert)
+    match parse(input) {
+        Ok(statement) => Some(statement),
+        Err(err) => {
+            eprintln!("{}", err);
+            None
         }
-        Some(&"select") => Some(&Statement::Select),
-        _ => None,
     }
 }
 
