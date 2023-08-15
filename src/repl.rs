@@ -62,7 +62,7 @@ fn do_meta_command(input: &String) -> MetaCommandResult {
     MetaCommandResult::UnrecognizedCommand
 }
 
-fn prepare_statement(input: &String) -> Option<&dyn Statement> {
+fn prepare_statement(input: &String) -> Option<Box<dyn Statement>> {
     match parse(input) {
         Ok(statement) => Some(statement),
         Err(err) => {
@@ -72,17 +72,6 @@ fn prepare_statement(input: &String) -> Option<&dyn Statement> {
     }
 }
 
-fn execute_statement(statement: &dyn Statement) {
-    match statement {
-        _InsertStatement => {}
-        _SelectStatement => {}
-    }
-    // match statement {
-    //     Statement::Insert => {
-    //         println!("This is where we would do an insert.")
-    //     }
-    //     Statement::Select => {
-    //         println!("This is where we would do a select.")
-    //     }
-    // }
+fn execute_statement(statement: Box<dyn Statement>) {
+    statement.execute();
 }

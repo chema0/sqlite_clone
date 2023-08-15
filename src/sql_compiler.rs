@@ -1,23 +1,33 @@
 use crate::database::Row;
 
-pub trait Statement {}
-
-pub struct InsertStatement<'a> {
-    row: &'a Row,
+pub trait Statement {
+    fn execute(&self);
 }
 
-impl<'a> Statement for InsertStatement<'a> {}
+pub struct InsertStatement {
+    pub row: Row,
+}
+
+impl Statement for InsertStatement {
+    fn execute(&self) {
+        println!("This is where we would do an insert.")
+    }
+}
 
 pub struct SelectStatement {}
 
-impl Statement for SelectStatement {}
+impl Statement for SelectStatement {
+    fn execute(&self) {
+        println!("This is where we would do a select.")
+    }
+}
 
 fn tokenize(input: &str) -> Vec<&str> {
     let tokens: Vec<&str> = input.split(' ').collect();
     return tokens;
 }
 
-type Result<'a> = std::result::Result<&'a dyn Statement, String>;
+type Result = std::result::Result<Box<dyn Statement>, String>;
 
 pub fn parse(input: &str) -> Result {
     let tokens = tokenize(input);
@@ -34,19 +44,14 @@ fn parse_insert(tokens: Vec<&str>) -> Result {
     }
 
     let row: Row = Row {
-        id: tokens[0].parse().expect("The 'id' must be a number!"),
-        username: tokens[1].to_string(),
-        email: tokens[2].to_string(),
+        id: tokens[1].parse().expect("The 'id' must be a number!"),
+        username: tokens[2].to_string(),
+        email: tokens[3].to_string(),
     };
 
-    Ok(&InsertStatement { row: &row })
+    Ok(Box::new(InsertStatement { row }))
 }
 
 fn parse_select(_tokens: Vec<&str>) -> Result {
-    Ok(&SelectStatement {})
+    Ok(Box::new(SelectStatement {}))
 }
-
-/* FIXME: need to deal with ambiguous associated type */
-// fn field_size<T>() -> usize {
-//     mem::size_of::<T>()
-// }
