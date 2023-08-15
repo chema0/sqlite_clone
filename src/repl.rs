@@ -3,7 +3,7 @@ use std::{
     process::exit,
 };
 
-use crate::compiler::{parse, Statement};
+use crate::sql_compiler::{parse, Statement};
 
 const SUCCESS_EXIT: i32 = 1;
 
@@ -27,7 +27,7 @@ pub fn start_repl() {
             None => continue,
         };
 
-        execute_statement(&statement);
+        execute_statement(statement);
         println!("Executed.")
     }
 }
@@ -62,7 +62,7 @@ fn do_meta_command(input: &String) -> MetaCommandResult {
     MetaCommandResult::UnrecognizedCommand
 }
 
-fn prepare_statement(input: &String) -> Option<&Statement> {
+fn prepare_statement(input: &String) -> Option<&dyn Statement> {
     match parse(input) {
         Ok(statement) => Some(statement),
         Err(err) => {
@@ -72,13 +72,17 @@ fn prepare_statement(input: &String) -> Option<&Statement> {
     }
 }
 
-fn execute_statement(statement: &Statement) {
+fn execute_statement(statement: &dyn Statement) {
     match statement {
-        Statement::Insert => {
-            println!("This is where we would do an insert.")
-        }
-        Statement::Select => {
-            println!("This is where we would do a select.")
-        }
+        _InsertStatement => {}
+        _SelectStatement => {}
     }
+    // match statement {
+    //     Statement::Insert => {
+    //         println!("This is where we would do an insert.")
+    //     }
+    //     Statement::Select => {
+    //         println!("This is where we would do a select.")
+    //     }
+    // }
 }
